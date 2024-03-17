@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import {
   ApplicationWindow,
+  AspectFrame,
   Box,
   Button,
   Frame,
@@ -62,21 +63,30 @@ export default function App() {
         marginBottom={margin}
         marginStart={margin}
       >
-        <Grid.Container
+        <AspectFrame
           hexpand
           vexpand
           halign={Gtk.Align.FILL}
           valign={Gtk.Align.FILL}
-          marginStart={48}
-          marginEnd={48}
           marginBottom={24}
-          rowHomogeneous
-          columnHomogeneous
-          rowSpacing={keySpacing}
-          columnSpacing={keySpacing}
+          ratio={5 / 6}
+          obeyChild={false}
         >
-          {elementGridItems}
-        </Grid.Container>
+          <Box hexpand vexpand halign={Gtk.Align.FILL} valign={Gtk.Align.FILL}>
+            <Grid.Container
+              hexpand
+              vexpand
+              halign={Gtk.Align.FILL}
+              valign={Gtk.Align.FILL}
+              rowHomogeneous
+              columnHomogeneous
+              rowSpacing={keySpacing}
+              columnSpacing={keySpacing}
+            >
+              {elementGridItems}
+            </Grid.Container>
+          </Box>
+        </AspectFrame>
         {keyRows.map((row) => (
           <Box
             key={row}
