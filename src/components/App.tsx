@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ApplicationWindow,
   AspectFrame,
@@ -12,19 +12,46 @@ import {
   useApplication,
   useStylesheet,
 } from "react-native-gtk4";
+import Keyboard from "./Keyboard";
 
 export default function App() {
-  const [guessRows, setGuessRows] = useState(["asd"]);
+  useStylesheet("data/styles.css");
   const { quit } = useApplication();
 
-  useStylesheet("data/styles.css");
+  const [guessRows, setGuessRows] = useState<string[]>([]);
+  const [guessed, setGuessed] = useState(0);
+  const currentGuess = useMemo(
+    () => guessRows[guessed] ?? "",
+    [guessRows, guessed]
+  );
+  const keyboardState = useMemo(() => {
+    let backspace = true;
+    let enter = true;
+    let letters = true;
 
-  const keyRows = ["qwertyuiop", "asdfghjkl", "-zxcvbnm*"];
+    if (guessed >= 6) {
+      backspace = false;
+      enter = false;
+      letters = false;
+    } else if (currentGuess.length == 0) {
+      backspace = false;
+      enter = false;
+    } else if (currentGuess.length >= 5) {
+      letters = false;
+    } else {
+      enter = false;
+    }
+
+    return {
+      backspace,
+      enter,
+      letters,
+    };
+  }, [currentGuess]);
+
   const width = 380;
   const keySpacing = 4;
-  const totalHorizontalSpacing = keySpacing * keyRows[0].length;
   const margin = 16;
-  const keySize = (width - totalHorizontalSpacing) / keyRows[0].length;
 
   const elementGridItems = [];
   for (let i = 0; i < 6; i++) {
@@ -38,6 +65,28 @@ export default function App() {
       );
     }
     elementGridItems.push(row);
+  }
+
+  function onKeyPress(key: string) {
+    if (guessed >= 6) return;
+    console.log(guessed, guessRows, key);
+
+    if (key === "Enter") {
+      if (currentGuess.length < 5) return;
+      setGuessed(guessed + 1);
+    } else if (key === "Backspace") {
+      if (!currentGuess.length) return;
+      const newRows = [...guessRows];
+      newRows[guessed] = newRows[guessed].slice(0, -1);
+      setGuessRows(newRows);
+    } else if (/[a-zA-Z]/.test(key) && currentGuess.length < 5) {
+      const newRows = [...guessRows];
+      newRows[guessed] ??= "";
+      newRows[guessed] += key.toLowerCase();
+
+      setGuessRows(newRows);
+    }
+    console.log(guessed, guessRows, key);
   }
 
   return (
@@ -87,45 +136,7 @@ export default function App() {
             </Grid.Container>
           </Box>
         </AspectFrame>
-        {keyRows.map((row) => (
-          <Box
-            key={row}
-            orientation={Gtk.Orientation.HORIZONTAL}
-            halign={Gtk.Align.CENTER}
-            heightRequest={60}
-            spacing={4}
-          >
-            {row.split("").map((letter) => {
-              let element;
-              if (letter === "-") {
-                element = (
-                  <Button
-                    label="DELETE"
-                    widthRequest={keySize}
-                    heightRequest={keySize}
-                  />
-                );
-              } else if (letter === "*") {
-                element = (
-                  <Button
-                    label="ENTER"
-                    widthRequest={keySize}
-                    heightRequest={keySize}
-                  />
-                );
-              } else {
-                element = (
-                  <Button
-                    label={letter}
-                    widthRequest={keySize}
-                    heightRequest={keySize}
-                  />
-                );
-              }
-              return <Fragment key={letter}>{element}</Fragment>;
-            })}
-          </Box>
-        ))}
+        <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
       </Box>
     </ApplicationWindow>
   );
