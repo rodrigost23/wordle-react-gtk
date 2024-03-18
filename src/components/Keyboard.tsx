@@ -34,6 +34,7 @@ export default function Keyboard({
             <Button
               label="DELETE"
               sensitive={state?.backspace ?? true}
+              focusable={false}
               widthRequest={keySize}
               heightRequest={keySize}
               onClicked={() => onKeyPress?.("Backspace")}
@@ -54,6 +55,7 @@ export default function Keyboard({
             <Button
               label={letter}
               sensitive={state?.letters ?? true}
+              focusable={false}
               widthRequest={keySize}
               heightRequest={keySize}
               onClicked={() => onKeyPress?.(letter.toLowerCase())}

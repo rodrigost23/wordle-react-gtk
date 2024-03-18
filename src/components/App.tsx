@@ -18,6 +18,12 @@ import Keyboard from "./Keyboard";
 interface GameState {
   guessRows: string[];
   guessed: number;
+  currentGuess: string;
+}
+
+interface GameStateSetter {
+  guessRows?: string[];
+  guessed?: number;
 }
 
 export default function App() {
@@ -25,22 +31,21 @@ export default function App() {
   const { quit, application } = useApplication();
 
   const [state, setState] = useReducer(
-    (
-      state: GameState,
-      action: (state: GameState) => Partial<GameState>
-    ) => ({
-      ...state,
-      ...action(state),
-    }),
+    (state: GameState, action: (state: GameState) => GameStateSetter) => {
+      const newState = {
+        ...state,
+        ...action(state),
+      };
+      return {
+        ...newState,
+        currentGuess: newState.guessRows[newState.guessed] ?? "",
+      };
+    },
     {
       guessRows: [],
       guessed: 0,
+      currentGuess: "",
     }
-  );
-
-  const currentGuess = useMemo(
-    () => state.guessRows[state.guessed] ?? "",
-    [state.guessRows, state.guessed]
   );
 
   const keyboardState = useMemo(() => {
@@ -52,10 +57,10 @@ export default function App() {
       backspace = false;
       enter = false;
       letters = false;
-    } else if (currentGuess.length == 0) {
+    } else if (state.currentGuess.length == 0) {
       backspace = false;
       enter = false;
-    } else if (currentGuess.length >= 5) {
+    } else if (state.currentGuess.length >= 5) {
       letters = false;
     } else {
       enter = false;
@@ -66,7 +71,7 @@ export default function App() {
       enter,
       letters,
     };
-  }, [state.guessed, currentGuess]);
+  }, [state]);
 
   const width = 380;
   const keySpacing = 4;
@@ -81,14 +86,14 @@ export default function App() {
         let updatedGuessed = state.guessed;
 
         if (key === "Enter") {
-          if (currentGuess.length < 5) return state;
+          if (state.currentGuess.length < 5) return state;
           updatedGuessed += 1;
         } else if (key === "Backspace") {
-          if (!currentGuess.length) return state;
+          if (!state.currentGuess.length) return state;
           updatedGuessRows[state.guessed] = updatedGuessRows[
             state.guessed
           ].slice(0, -1);
-        } else if (/[a-zA-Z]/.test(key) && currentGuess.length < 5) {
+        } else if (/[a-zA-Z]/.test(key) && state.currentGuess.length < 5) {
           updatedGuessRows[state.guessed] ??= "";
           updatedGuessRows[state.guessed] += key.toLowerCase();
         }
@@ -99,7 +104,7 @@ export default function App() {
         };
       });
     },
-    [currentGuess]
+    [state.currentGuess]
   );
 
   application.connect("window-added", (window) => {
