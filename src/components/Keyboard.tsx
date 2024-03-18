@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from "react";
+import React, { Fragment } from "react";
 import { Box, Button, Gtk } from "react-native-gtk4";
 
 export default function Keyboard({
@@ -12,7 +12,6 @@ export default function Keyboard({
     letters: boolean;
   };
 }) {
-  const parentBox = useRef(null);
   const keyRows = ["QWERTYUIOP", "ASDFGHJKL", "-ZXCVBNM*"];
   const width = 380;
   const keySpacing = 4;
@@ -22,7 +21,6 @@ export default function Keyboard({
 
   return keyRows.map((row) => (
     <Box
-      ref={parentBox}
       key={row}
       orientation={Gtk.Orientation.HORIZONTAL}
       halign={Gtk.Align.CENTER}

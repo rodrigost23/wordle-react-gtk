@@ -1,36 +1,54 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useReducer, useRef } from "react";
+
 import {
   ApplicationWindow,
   AspectFrame,
   Box,
   Button,
-  Frame,
-  Grid,
   Gtk,
   HeaderBar,
   Label,
   useApplication,
   useStylesheet,
+  Gdk,
 } from "react-native-gtk4";
-import Keyboard from "./Keyboard";
 import GuessGrid from "./GuessGrid";
+import Keyboard from "./Keyboard";
+
+interface GameState {
+  guessRows: string[];
+  guessed: number;
+}
 
 export default function App() {
   useStylesheet("data/styles.css");
-  const { quit } = useApplication();
+  const { quit, application } = useApplication();
 
-  const [guessRows, setGuessRows] = useState<string[]>([]);
-  const [guessed, setGuessed] = useState(0);
-  const currentGuess = useMemo(
-    () => guessRows[guessed] ?? "",
-    [guessRows, guessed]
+  const [state, setState] = useReducer(
+    (
+      state: GameState,
+      action: (state: GameState) => Partial<GameState>
+    ) => ({
+      ...state,
+      ...action(state),
+    }),
+    {
+      guessRows: [],
+      guessed: 0,
+    }
   );
+
+  const currentGuess = useMemo(
+    () => state.guessRows[state.guessed] ?? "",
+    [state.guessRows, state.guessed]
+  );
+
   const keyboardState = useMemo(() => {
     let backspace = true;
     let enter = true;
     let letters = true;
 
-    if (guessed >= 6) {
+    if (state.guessed >= 6) {
       backspace = false;
       enter = false;
       letters = false;
@@ -48,31 +66,59 @@ export default function App() {
       enter,
       letters,
     };
-  }, [currentGuess]);
+  }, [state.guessed, currentGuess]);
 
   const width = 380;
   const keySpacing = 4;
   const margin = 16;
 
-  function onKeyPress(key: string) {
-    if (guessed >= 6) return;
+  const onKeyPress = useCallback(
+    (key: string) => {
+      setState((state: GameState) => {
+        if (state.guessed >= 6) return state;
 
-    if (key === "Enter") {
-      if (currentGuess.length < 5) return;
-      setGuessed(guessed + 1);
-    } else if (key === "Backspace") {
-      if (!currentGuess.length) return;
-      const newRows = [...guessRows];
-      newRows[guessed] = newRows[guessed].slice(0, -1);
-      setGuessRows(newRows);
-    } else if (/[a-zA-Z]/.test(key) && currentGuess.length < 5) {
-      const newRows = [...guessRows];
-      newRows[guessed] ??= "";
-      newRows[guessed] += key.toLowerCase();
+        let updatedGuessRows = [...state.guessRows];
+        let updatedGuessed = state.guessed;
 
-      setGuessRows(newRows);
-    }
-  }
+        if (key === "Enter") {
+          if (currentGuess.length < 5) return state;
+          updatedGuessed += 1;
+        } else if (key === "Backspace") {
+          if (!currentGuess.length) return state;
+          updatedGuessRows[state.guessed] = updatedGuessRows[
+            state.guessed
+          ].slice(0, -1);
+        } else if (/[a-zA-Z]/.test(key) && currentGuess.length < 5) {
+          updatedGuessRows[state.guessed] ??= "";
+          updatedGuessRows[state.guessed] += key.toLowerCase();
+        }
+
+        return {
+          guessRows: updatedGuessRows,
+          guessed: updatedGuessed,
+        };
+      });
+    },
+    [currentGuess]
+  );
+
+  application.connect("window-added", (window) => {
+    const eventKey = new Gtk.EventControllerKey();
+    eventKey.connect("key-released", (keyval) => {
+      if (keyval === Gdk.KEY_Return) {
+        onKeyPress("Enter");
+      } else if (keyval === Gdk.KEY_BackSpace) {
+        onKeyPress("Backspace");
+      } else if (
+        (keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
+        (keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z)
+      ) {
+        onKeyPress(String.fromCharCode(keyval));
+      }
+    });
+
+    window.addController(eventKey);
+  });
 
   return (
     <ApplicationWindow
@@ -107,7 +153,7 @@ export default function App() {
           obeyChild={false}
         >
           <Box hexpand vexpand halign={Gtk.Align.FILL} valign={Gtk.Align.FILL}>
-            <GuessGrid spacing={keySpacing} guessRows={guessRows} />
+            <GuessGrid spacing={keySpacing} guessRows={state.guessRows} />
           </Box>
         </AspectFrame>
         <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
