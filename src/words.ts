@@ -4,28 +4,51 @@ const baseDate = new Date(2024, 0, 1);
 
 // TODO: Get list of five-letter words
 const words = ["laser"];
-
-function countDays(start: Date, end: Date) {
-  const startDate = new Date(baseDate);
+/**
+ * Calculate the number of days between two dates 
+ */
+function getDaysBetweenDates(start: Date, end: Date) {
+  const startDate = start;
   startDate.setHours(0, 0, 0, 0);
 
-  const endDate = new Date();
+  const endDate = end;
   endDate.setHours(0, 0, 0, 0);
 
   return Math.floor((endDate.getTime() - startDate.getTime()) / oneDay);
 }
 
+/**
+ * Get the number of days since the base date
+ */ 
 export function countDaysToday(): number {
-  return countDays(baseDate, new Date());
+  return getDaysBetweenDates(baseDate, new Date());
 }
 
+/**
+ * Get the word for the current day
+ */
 export function getTodayWord(): string {
   const today = baseDate.getDate();
   const wordIndex = today % words.length;
   return words[wordIndex];
 }
 
-type LetterCorrectness = "wrong" | "partial" | "perfect";
+type LetterStatus = "absent" | "partial" | "perfect";
+type LetterCounts = { [letter: string]: number };
+
+/**
+ * Count number of occurrences of each letter in a word
+ */
+function countLetters(word: string): LetterCounts {
+  const counts: LetterCounts = {};
+
+  for (const letter of word) {
+    counts[letter] = (counts[letter] || 0) + 1;
+  }
+
+  return counts;
+}
+
 /**
  * Checks if the letters in the guessed word match the correct word.
  *
@@ -35,40 +58,30 @@ type LetterCorrectness = "wrong" | "partial" | "perfect";
  * - Matches are "perfect" if the letter is in the correct word and correct position.
  *
  * @param guessedWord - The guessed word
- * @param correctWord - The correct word
- * @returns {LetterCorrectness[]}
+ * @param solution - The correct word
+ * @returns {LetterStatus[]} An array of letter statuses ('perfect', 'partial', 'absent')
  */
 export function checkGuess(
   guessedWord: string,
-  correctWord: string
-): LetterCorrectness[] {
-  const lettersCount: { [letter: string]: number } = {};
+  solution: string
+): LetterStatus[] {
+  const letterCounts = countLetters(solution);
 
-  for (const letter of correctWord) {
-    lettersCount[letter] = (lettersCount[letter] || 0) + 1;
-  }
+  const statuses = new Array<LetterStatus>(guessedWord.length).fill("absent");
 
-  const result: LetterCorrectness[] = [];
-
-  for (let i = 0; i < guessedWord.length; i++) {
-    if (guessedWord[i] === correctWord[i]) {
-      result[i] = "perfect";
-      lettersCount[guessedWord[i]]--;
+  guessedWord.split("").forEach((letter, i) => {
+    if (letter === solution[i]) {
+      statuses[i] = "perfect";
+      letterCounts[letter]--;
     }
-  }
+  });
 
-  for (let i = 0; i < guessedWord.length; i++) {
-    if (result[i] === "perfect") {
-      continue;
+  guessedWord.split("").forEach((letter, i) => {
+    if (statuses[i] === "absent" && letterCounts[letter] > 0) {
+      statuses[i] = "partial";
+      letterCounts[letter]--;
     }
+  });
 
-    if (lettersCount[guessedWord[i]] > 0) {
-      result[i] = "partial";
-      lettersCount[guessedWord[i]]--;
-    } else {
-      result[i] = "wrong";
-    }
-  }
-
-  return result;
+  return statuses;
 }
