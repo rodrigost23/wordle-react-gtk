@@ -15,15 +15,23 @@ import {
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
 
-interface GameState {
+interface IGameState {
   guessRows: string[];
   guessed: number;
-  currentGuess: string;
 }
 
-interface GameStateSetter {
-  guessRows?: string[];
-  guessed?: number;
+class GameState implements IGameState {
+  guessRows: string[];
+  guessed: number;
+
+  constructor({ guessRows = [], guessed = 0 }: Partial<IGameState> = {}) {
+    this.guessRows = guessRows;
+    this.guessed = guessed;
+  }
+
+  get currentGuess() {
+    return this.guessRows[this.guessed] ?? "";
+  }
 }
 
 export default function App() {
@@ -31,21 +39,14 @@ export default function App() {
   const { quit, application } = useApplication();
 
   const [state, setState] = useReducer(
-    (state: GameState, action: (state: GameState) => GameStateSetter) => {
+    (state: GameState, action: (state: GameState) => IGameState) => {
       const newState = {
         ...state,
         ...action(state),
       };
-      return {
-        ...newState,
-        currentGuess: newState.guessRows[newState.guessed] ?? "",
-      };
+      return new GameState({ ...newState });
     },
-    {
-      guessRows: [],
-      guessed: 0,
-      currentGuess: "",
-    }
+    new GameState()
   );
 
   const keyboardState = useMemo(() => {

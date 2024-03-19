@@ -19,6 +19,12 @@ export default function Keyboard({
   const totalHorizontalSpacing = keySpacing * keyRows[0].length - margin;
   const keySize = (width - totalHorizontalSpacing) / keyRows[0].length;
 
+  function onEnterNotifySensitive(node: Gtk.Widget): void {
+    if (node.sensitive) {
+      node.grabFocus();
+    }
+  }
+
   return keyRows.map((row) => (
     <Box
       key={row}
@@ -45,6 +51,7 @@ export default function Keyboard({
             <Button
               label="ENTER"
               sensitive={state?.enter ?? true}
+              onNotifySensitive={onEnterNotifySensitive}
               widthRequest={keySize}
               heightRequest={keySize}
               onClicked={() => onKeyPress?.("Enter")}
