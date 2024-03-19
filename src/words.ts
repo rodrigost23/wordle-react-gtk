@@ -51,27 +51,23 @@ export function checkGuess(
   const result: LetterCorrectness[] = [];
 
   for (let i = 0; i < guessedWord.length; i++) {
-    const guessLetter = guessedWord[i];
-    const correctLetter = correctWord[i];
-
-    if (guessLetter === correctLetter) {
-      lettersCount[guessLetter]--;
+    if (guessedWord[i] === correctWord[i]) {
+      result[i] = "perfect";
+      lettersCount[guessedWord[i]]--;
     }
   }
 
   for (let i = 0; i < guessedWord.length; i++) {
-    let correctness: LetterCorrectness = "wrong";
-    const guessLetter = guessedWord[i];
-    const correctLetter = correctWord[i];
-
-    if (guessLetter === correctLetter) {
-      correctness = "perfect";
-    } else if (lettersCount[guessLetter] > 0) {
-      correctness = "partial";
-      lettersCount[guessLetter]--;
+    if (result[i] === "perfect") {
+      continue;
     }
 
-    result.push(correctness);
+    if (lettersCount[guessedWord[i]] > 0) {
+      result[i] = "partial";
+      lettersCount[guessedWord[i]]--;
+    } else {
+      result[i] = "wrong";
+    }
   }
 
   return result;
