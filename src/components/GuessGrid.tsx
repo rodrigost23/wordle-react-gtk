@@ -1,6 +1,7 @@
 import React from "react";
 import { Frame, Grid, Gtk } from "react-native-gtk4";
 import { GameState } from "../models/GameState";
+import { checkGuess } from "../words";
 
 export default function GuessGrid({
   spacing,
@@ -13,18 +14,13 @@ export default function GuessGrid({
 }) {
   const elementGridItems = [];
   for (let i = 0; i < 6; i++) {
+    const checked = checkGuess(state.guessRows[i] ?? "", correctWord);
     const row = [];
     for (let j = 0; j < 5; j++) {
       const letter = state.guessRows[i]?.[j] ?? "";
       const cssClasses = ["guess-frame"];
       if (state.guessed > i) {
-        if (correctWord[j] === letter) {
-          cssClasses.push("perfect");
-        } else if (correctWord.includes(letter)) {
-          cssClasses.push("partial");
-        } else {
-          cssClasses.push("wrong");
-        }
+        cssClasses.push(checked[j]);
       }
       row.push(
         <Grid.Item row={i} col={j} key={`guess-${i}-${j}`}>
