@@ -1,38 +1,20 @@
-import React, { useCallback, useMemo, useReducer, useRef } from "react";
+import React, { useCallback, useMemo, useReducer } from "react";
 
 import {
   ApplicationWindow,
   AspectFrame,
   Box,
   Button,
+  Gdk,
   Gtk,
   HeaderBar,
   Label,
   useApplication,
   useStylesheet,
-  Gdk,
 } from "react-native-gtk4";
+import { GameState, IGameState } from "../models/GameState";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
-
-interface IGameState {
-  guessRows: string[];
-  guessed: number;
-}
-
-class GameState implements IGameState {
-  guessRows: string[];
-  guessed: number;
-
-  constructor({ guessRows = [], guessed = 0 }: Partial<IGameState> = {}) {
-    this.guessRows = guessRows;
-    this.guessed = guessed;
-  }
-
-  get currentGuess() {
-    return this.guessRows[this.guessed] ?? "";
-  }
-}
 
 export default function App() {
   useStylesheet("data/styles.css");
@@ -159,7 +141,7 @@ export default function App() {
           obeyChild={false}
         >
           <Box hexpand vexpand halign={Gtk.Align.FILL} valign={Gtk.Align.FILL}>
-            <GuessGrid spacing={keySpacing} guessRows={state.guessRows} />
+            <GuessGrid spacing={keySpacing} state={state} />
           </Box>
         </AspectFrame>
         <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
