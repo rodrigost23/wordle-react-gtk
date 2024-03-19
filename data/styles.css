@@ -3,3 +3,15 @@
   font-size: x-large;
   font-weight: bold;
 }
+
+.guess-frame.perfect {
+  background-color: #57e38985;
+}
+
+.guess-frame.partial {
+  background-color: #f8e45c85;
+}
+
+.guess-frame.wrong {
+  background-color: #77767b85;
+}

@@ -15,10 +15,13 @@ import {
 import { GameState, IGameState } from "../models/GameState";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
+import { getTodayWord } from "../words";
 
 export default function App() {
   useStylesheet("data/styles.css");
   const { quit, application } = useApplication();
+
+  const correctWord = getTodayWord();
 
   const [state, setState] = useReducer(
     (state: GameState, action: (state: GameState) => IGameState) => {
@@ -141,7 +144,11 @@ export default function App() {
           obeyChild={false}
         >
           <Box hexpand vexpand halign={Gtk.Align.FILL} valign={Gtk.Align.FILL}>
-            <GuessGrid spacing={keySpacing} state={state} />
+            <GuessGrid
+              spacing={keySpacing}
+              state={state}
+              correctWord={correctWord}
+            />
           </Box>
         </AspectFrame>
         <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
