@@ -9,13 +9,14 @@ import {
   Gtk,
   HeaderBar,
   Label,
+  Overlay,
   useApplication,
   useStylesheet,
 } from "react-native-gtk4";
 import { GameState, IGameState } from "../models/GameState";
+import { getTodayWord } from "../words";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
-import { getTodayWord } from "../words";
 
 export default function App() {
   useStylesheet("data/styles.css");
@@ -59,7 +60,6 @@ export default function App() {
     };
   }, [state]);
 
-  const width = 380;
   const keySpacing = 4;
   const margin = 16;
 
@@ -115,7 +115,7 @@ export default function App() {
     <ApplicationWindow
       title="Wordle"
       onCloseRequest={quit}
-      defaultWidth={width}
+      defaultWidth={600}
       defaultHeight={720}
       resizable={false}
       titlebar={
@@ -126,33 +126,44 @@ export default function App() {
         </HeaderBar.Container>
       }
     >
-      <Box
-        orientation={Gtk.Orientation.VERTICAL}
-        spacing={4}
-        marginTop={margin}
-        marginEnd={margin}
-        marginBottom={margin}
-        marginStart={margin}
-      >
-        <AspectFrame
+      <Overlay content={<Box visible={false}>PLACEHOLDER</Box>}>
+        <Box
           hexpand
           vexpand
           halign={Gtk.Align.FILL}
           valign={Gtk.Align.FILL}
-          marginBottom={24}
-          ratio={5 / 6}
-          obeyChild={false}
+          orientation={Gtk.Orientation.VERTICAL}
+          spacing={4}
+          marginTop={margin}
+          marginEnd={margin}
+          marginBottom={margin}
+          marginStart={margin}
         >
-          <Box hexpand vexpand halign={Gtk.Align.FILL} valign={Gtk.Align.FILL}>
-            <GuessGrid
-              spacing={keySpacing}
-              state={state}
-              correctWord={correctWord}
-            />
-          </Box>
-        </AspectFrame>
-        <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
-      </Box>
+          <AspectFrame
+            hexpand
+            vexpand
+            halign={Gtk.Align.FILL}
+            valign={Gtk.Align.FILL}
+            marginBottom={24}
+            ratio={5 / 6}
+            obeyChild={false}
+          >
+            <Box
+              hexpand
+              vexpand
+              halign={Gtk.Align.FILL}
+              valign={Gtk.Align.FILL}
+            >
+              <GuessGrid
+                spacing={keySpacing}
+                state={state}
+                correctWord={correctWord}
+              />
+            </Box>
+          </AspectFrame>
+          <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
+        </Box>
+      </Overlay>
     </ApplicationWindow>
   );
 }
