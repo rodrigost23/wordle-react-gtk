@@ -1,10 +1,15 @@
-import solutions from "../data/words/solutions-en.json";
+import solutions from "./data/words/solutions-en.json";
+
+import available from "./data/words/available-en.json";
 
 const oneDay = 24 * 60 * 60 * 1000;
 
 const baseDate = new Date(2024, 0, 1);
 
 const words = solutions;
+
+export const availableWords = available;
+
 /**
  * Calculate the number of days between two dates
  */

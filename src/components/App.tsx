@@ -13,12 +13,12 @@ import {
   useStylesheet,
 } from "react-native-gtk4";
 import { GameState, IGameState } from "../models/GameState";
-import { getTodayWord } from "../words";
+import { availableWords, getTodayWord } from "../words";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
 
 export default function App() {
-  useStylesheet("data/styles.css");
+  useStylesheet("src/data/styles.css");
   const { quit, application } = useApplication();
 
   const solution = getTodayWord();
@@ -79,7 +79,12 @@ export default function App() {
         let updatedGuessed = state.guessed;
 
         if (key === "Enter") {
-          if (state.currentGuess.length < 5) return state;
+          if (
+            state.currentGuess.length < 5 ||
+            // TODO: Add an "error" variable to the state:
+            !availableWords.includes(state.currentGuess)
+          )
+            return state;
           updatedGuessed += 1;
         } else if (key === "Backspace") {
           if (!state.currentGuess.length) return state;
