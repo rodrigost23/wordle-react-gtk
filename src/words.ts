@@ -1,11 +1,12 @@
+import solutions from "../data/words/solutions-en.json";
+
 const oneDay = 24 * 60 * 60 * 1000;
 
 const baseDate = new Date(2024, 0, 1);
 
-// TODO: Get list of five-letter words
-const words = ["laser"];
+const words = solutions;
 /**
- * Calculate the number of days between two dates 
+ * Calculate the number of days between two dates
  */
 function getDaysBetweenDates(start: Date, end: Date) {
   const startDate = start;
@@ -19,7 +20,7 @@ function getDaysBetweenDates(start: Date, end: Date) {
 
 /**
  * Get the number of days since the base date
- */ 
+ */
 export function countDaysToday(): number {
   return getDaysBetweenDates(baseDate, new Date());
 }
@@ -28,8 +29,7 @@ export function countDaysToday(): number {
  * Get the word for the current day
  */
 export function getTodayWord(): string {
-  const today = baseDate.getDate();
-  const wordIndex = today % words.length;
+  const wordIndex = countDaysToday() % words.length;
   return words[wordIndex];
 }
 

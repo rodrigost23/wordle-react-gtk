@@ -19,9 +19,9 @@ describe("Words", () => {
 
   describe("getTodayWord", () => {
     it("should return the correct word for a given date", () => {
-      jest.useFakeTimers().setSystemTime(new Date(2024, 2, 2));
+      jest.useFakeTimers().setSystemTime(new Date(2024, 2, 1));
       const today = getTodayWord();
-      expect(today).toBe("laser");
+      expect(today).toBe("jolly");
     });
   });
 });
