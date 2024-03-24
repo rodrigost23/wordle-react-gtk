@@ -9,7 +9,6 @@ import {
   Gtk,
   HeaderBar,
   Label,
-  Overlay,
   useApplication,
   useStylesheet,
 } from "react-native-gtk4";
@@ -22,7 +21,7 @@ export default function App() {
   useStylesheet("data/styles.css");
   const { quit, application } = useApplication();
 
-  const correctWord = getTodayWord();
+  const solution = getTodayWord();
 
   const [state, setState] = useReducer(
     (state: GameState, action: (state: GameState) => IGameState) => {
@@ -32,15 +31,23 @@ export default function App() {
       };
       return new GameState({ ...newState });
     },
-    new GameState()
+    new GameState({ solution })
   );
+
+  const message: string = useMemo(() => {
+    if (state.isFinished) {
+      return "Finished";
+    }
+
+    return "";
+  }, [state.isFinished]);
 
   const keyboardState = useMemo(() => {
     let backspace = true;
     let enter = true;
     let letters = true;
 
-    if (state.guessed >= 6) {
+    if (state.isFinished) {
       backspace = false;
       enter = false;
       letters = false;
@@ -66,7 +73,7 @@ export default function App() {
   const onKeyPress = useCallback(
     (key: string) => {
       setState((state: GameState) => {
-        if (state.guessed >= 6) return state;
+        if (state.isFinished) return state;
 
         let updatedGuessRows = [...state.guessRows];
         let updatedGuessed = state.guessed;
@@ -126,44 +133,38 @@ export default function App() {
         </HeaderBar.Container>
       }
     >
-      <Overlay content={<Box visible={false}>PLACEHOLDER</Box>}>
-        <Box
+      <Box
+        hexpand
+        vexpand
+        halign={Gtk.Align.FILL}
+        valign={Gtk.Align.FILL}
+        orientation={Gtk.Orientation.VERTICAL}
+        spacing={4}
+        marginTop={margin}
+        marginEnd={margin}
+        marginBottom={margin}
+        marginStart={margin}
+      >
+        <AspectFrame
           hexpand
           vexpand
           halign={Gtk.Align.FILL}
           valign={Gtk.Align.FILL}
-          orientation={Gtk.Orientation.VERTICAL}
-          spacing={4}
-          marginTop={margin}
-          marginEnd={margin}
-          marginBottom={margin}
-          marginStart={margin}
+          marginBottom={24}
+          ratio={5 / 6}
+          obeyChild={false}
         >
-          <AspectFrame
-            hexpand
-            vexpand
-            halign={Gtk.Align.FILL}
-            valign={Gtk.Align.FILL}
-            marginBottom={24}
-            ratio={5 / 6}
-            obeyChild={false}
-          >
-            <Box
-              hexpand
-              vexpand
-              halign={Gtk.Align.FILL}
-              valign={Gtk.Align.FILL}
-            >
-              <GuessGrid
-                spacing={keySpacing}
-                state={state}
-                correctWord={correctWord}
-              />
-            </Box>
-          </AspectFrame>
-          <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
-        </Box>
-      </Overlay>
+          <Box hexpand vexpand halign={Gtk.Align.FILL} valign={Gtk.Align.FILL}>
+            <GuessGrid
+              spacing={keySpacing}
+              state={state}
+              correctWord={solution}
+            />
+          </Box>
+        </AspectFrame>
+        <Label label={message} />
+        <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
+      </Box>
     </ApplicationWindow>
   );
 }
