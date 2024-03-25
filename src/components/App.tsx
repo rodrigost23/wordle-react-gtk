@@ -35,12 +35,20 @@ export default function App() {
   );
 
   const message: string = useMemo(() => {
+    if (state.error !== null) {
+      return state.error;
+    }
+
+    if (state.isSolved) {
+      return "Congratulations!";
+    }
+
     if (state.isFinished) {
-      return "Finished";
+      return `The correct word was "${solution}"`;
     }
 
     return "";
-  }, [state.isFinished]);
+  }, [state.isFinished, state.error]);
 
   const keyboardState = useMemo(() => {
     let backspace = true;
@@ -75,30 +83,30 @@ export default function App() {
       setState((state: GameState) => {
         if (state.isFinished) return state;
 
-        let updatedGuessRows = [...state.guessRows];
-        let updatedGuessed = state.guessed;
+        let guessRows = [...state.guessRows];
+        let guessed = state.guessed;
+        let error: string | null = null;
 
         if (key === "Enter") {
-          if (
-            state.currentGuess.length < 5 ||
-            // TODO: Add an "error" variable to the state:
-            !availableWords.includes(state.currentGuess)
-          )
-            return state;
-          updatedGuessed += 1;
+          if (state.currentGuess.length < 5) return state;
+
+          if (availableWords.includes(state.currentGuess)) {
+            guessed += 1;
+          } else {
+            error = `"${state.currentGuess}" is not in the words list!`;
+          }
         } else if (key === "Backspace") {
           if (!state.currentGuess.length) return state;
-          updatedGuessRows[state.guessed] = updatedGuessRows[
-            state.guessed
-          ].slice(0, -1);
+          guessRows[state.guessed] = guessRows[state.guessed].slice(0, -1);
         } else if (/[a-zA-Z]/.test(key) && state.currentGuess.length < 5) {
-          updatedGuessRows[state.guessed] ??= "";
-          updatedGuessRows[state.guessed] += key.toLowerCase();
+          guessRows[state.guessed] ??= "";
+          guessRows[state.guessed] += key.toLowerCase();
         }
 
         return {
-          guessRows: updatedGuessRows,
-          guessed: updatedGuessed,
+          guessRows,
+          guessed,
+          error,
         };
       });
     },

@@ -1,21 +1,25 @@
 export interface IGameState {
-  guessRows: string[];
-  guessed: number;
+  readonly guessRows: string[];
+  readonly guessed: number;
+  readonly error: string | null;
 }
 
 export class GameState implements IGameState {
   readonly solution: string;
   readonly guessRows: string[];
   readonly guessed: number;
+  readonly error: string | null;
 
   constructor({
     solution,
     guessRows = [],
     guessed = 0,
+    error = null,
   }: { solution: string } & Partial<IGameState>) {
     this.solution = solution;
     this.guessRows = guessRows;
     this.guessed = guessed;
+    this.error = error;
   }
 
   get currentGuess() {
