@@ -1,0 +1,37 @@
+app-id: com.rodrigotavares.Wordle
+runtime: org.gnome.Platform
+runtime-version: "46"
+sdk: org.gnome.Sdk
+command: /app/bin/wordle
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  - --filesystem=host
+modules:
+  - name: node
+    buildsystem: simple
+    build-options:
+      build-args:
+        - --share=network
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share
+    build-commands:
+      - echo $(case $(uname -m) in x86_64) echo x64 ;; aarch64) echo arm64 ;; esac) > ARCH
+      - echo https://nodejs.org/dist/v18.19.0/node-v18.19.0-linux-$(cat ARCH).tar.xz > URL
+      - curl -L $(cat URL) | tar -xJ --strip-components=1 -C /app/
+      - rm ARCH URL
+  - name: wordle
+    build-options:
+      build-args:
+        - --share=network
+    buildsystem: simple
+    build-commands:
+      - ./build-flatpak.sh
+    sources:
+      - type: dir
+        path: .

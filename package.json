@@ -8,7 +8,10 @@
     "build": "tsc",
     "build:debug": "tsc --sourceMap",
     "start": "npm run build && node dist/index.js",
-    "test": "jest"
+    "test": "jest",
+    "flatpak:build": "flatpak-builder --force-clean build com.rodrigotavares.Wordle.yml",
+    "flatpak:install": "flatpak-builder --user --install --force-clean build com.rodrigotavares.Wordle.yml",
+    "flatpak:run": "flatpak run com.rodrigotavares.Wordle"
   },
   "dependencies": {
     "react": "^18.2.0",
