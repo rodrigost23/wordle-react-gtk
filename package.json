@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "build:debug": "tsc --sourceMap",
     "start": "npm run build && node dist/index.js",
     "test": "jest"
   },

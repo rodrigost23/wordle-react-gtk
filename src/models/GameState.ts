@@ -15,7 +15,7 @@ export class GameState
   extends Model<GameStateAttributes, Partial<GameStateAttributes>>
   implements GameStateAttributes
 {
-  @Column
+  @Column({ primaryKey: true })
   date!: Date;
 
   @Column({ type: DataType.JSON, defaultValue: [] })

@@ -1,11 +1,12 @@
+import * as os from "os";
+import * as path from "path";
 import React from "react";
 import render, { Gio, Gtk } from "react-native-gtk4";
-import App from "./components/App.js";
-import * as os from "os";
-import * as fs from "fs";
-import * as path from "path";
 import { Sequelize } from "sequelize-typescript";
+import App from "./components/App.js";
 import ErrorAlert from "./components/ErrorAlert.js";
+import { GameState } from "./models/GameState.js";
+import { getTodayWord } from "./words.js";
 
 let dataLocation: string | undefined =
   process.env.APPDATA ??
@@ -14,8 +15,6 @@ let dataLocation: string | undefined =
     : process.env.XDG_DATA_HOME ?? path.join(os.homedir(), ".local", "share"));
 
 dataLocation = path.join(dataLocation, "wordle-gtk");
-
-// fs.mkdirSync(dataLocation);
 
 const application = new Gtk.Application(
   "com.rodrigotavares.wordle",
@@ -31,11 +30,19 @@ const sequelize = new Sequelize({
   models: [path.normalize(path.join(__dirname, "models"))],
 });
 
-sequelize
-  .sync()
-  .then((sequelize) => {
-    render(<App sequelize={sequelize} />, application);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+(async () => {
+  await sequelize.sync();
+  return (
+    (await GameState.findOne({ where: { date: today } })) ??
+    GameState.build({ date: today, solution: getTodayWord() })
+  );
+})()
+  .then((initialState) => {
+    render(<App initialState={initialState} />, application);
   })
-  .catch((err: Error) => {
-    render(<ErrorAlert error={err} />, application);
+  .catch((error: Error) => {
+    render(<ErrorAlert error={error} />, application);
   });

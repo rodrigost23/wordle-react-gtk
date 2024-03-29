@@ -13,23 +13,19 @@ import {
   useStylesheet,
 } from "react-native-gtk4";
 import { GameState, GameStateAttributes } from "../models/GameState";
-import { availableWords, getTodayWord } from "../words";
+import { availableWords } from "../words";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
-import { Sequelize } from "sequelize-typescript";
 
 interface Props {
-  readonly sequelize: Sequelize;
+  readonly initialState: GameState;
 }
 
-export default function App({ sequelize }: Props) {
+export default function App({ initialState }: Props) {
   useStylesheet("src/data/styles.css");
   const { quit, application } = useApplication();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const solution = getTodayWord();
+  const solution = initialState.solution;
 
   const [state, setState] = useReducer(
     (
@@ -41,19 +37,14 @@ export default function App({ sequelize }: Props) {
       }
 
       const newState = {
-        ...state,
+        ...state.dataValues,
         ...action(state),
       };
-      return new GameState({ ...newState });
-    },
-    GameState.build({ date: today, solution })
-  );
 
-  GameState.findOne({ where: { date: today } }).then((state) => {
-    if (state) {
-      setState(state);
-    }
-  });
+      return GameState.build({ ...newState });
+    },
+    initialState
+  );
 
   const message: string = useMemo(() => {
     if (state.error !== null) {
@@ -155,7 +146,7 @@ export default function App({ sequelize }: Props) {
   });
 
   function onClose() {
-    state.save();
+    GameState.upsert(state.dataValues);
     return quit();
   }
 
