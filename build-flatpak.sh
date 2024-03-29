@@ -9,7 +9,6 @@ find . -name "node_modules" -type d -prune -exec rm -rf '{}' +
 # Copy root level dependencies to /app/opt/wordle
 mkdir -p /app/opt/wordle
 cp -r node_modules /app/opt/wordle/
-cp -r packages /app/opt/wordle/
 cp package.json /app/opt/wordle/
 
 # Build the app

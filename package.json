@@ -1,5 +1,5 @@
 {
-  "name": "Wordle GTK",
+  "name": "wordle-gtk",
   "version": "1.0.0",
   "description": "Wordle clone using react native and GTK4",
   "main": "dist/index.js",
@@ -9,8 +9,9 @@
     "build:debug": "tsc --sourceMap",
     "start": "npm run build && node dist/index.js",
     "test": "jest",
-    "flatpak:build": "flatpak-builder --force-clean build com.rodrigotavares.Wordle.yml",
+    "flatpak:build": "flatpak-builder --force-clean --bundle-sources build com.rodrigotavares.Wordle.yml",
     "flatpak:install": "flatpak-builder --user --install --force-clean build com.rodrigotavares.Wordle.yml",
+    "flatpak:bundle": "flatpak build-export export build && flatpak build-bundle export wordle-gtk.flatpak com.rodrigotavares.Wordle",
     "flatpak:run": "flatpak run com.rodrigotavares.Wordle"
   },
   "dependencies": {
