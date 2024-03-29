@@ -1,26 +1,34 @@
-export interface IGameState {
+import { Column, DataType, Model, Table } from "sequelize-typescript";
+
+export interface GameStateAttributes {
+  readonly date: Date;
   readonly guessRows: string[];
   readonly guessed: number;
   readonly error: string | null;
+  readonly solution: string;
 }
 
-export class GameState implements IGameState {
-  readonly solution: string;
-  readonly guessRows: string[];
-  readonly guessed: number;
-  readonly error: string | null;
+@Table({
+  timestamps: false,
+})
+export class GameState
+  extends Model<GameStateAttributes, Partial<GameStateAttributes>>
+  implements GameStateAttributes
+{
+  @Column
+  date!: Date;
 
-  constructor({
-    solution,
-    guessRows = [],
-    guessed = 0,
-    error = null,
-  }: { solution: string } & Partial<IGameState>) {
-    this.solution = solution;
-    this.guessRows = guessRows;
-    this.guessed = guessed;
-    this.error = error;
-  }
+  @Column({ type: DataType.JSON, defaultValue: [] })
+  guessRows!: string[];
+
+  @Column({ defaultValue: 0 })
+  guessed!: number;
+
+  @Column({ type: DataType.STRING, defaultValue: null })
+  error!: string | null;
+
+  @Column
+  solution!: string;
 
   get currentGuess() {
     return this.guessRows[this.guessed] ?? "";

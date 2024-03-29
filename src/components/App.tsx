@@ -12,27 +12,48 @@ import {
   useApplication,
   useStylesheet,
 } from "react-native-gtk4";
-import { GameState, IGameState } from "../models/GameState";
+import { GameState, GameStateAttributes } from "../models/GameState";
 import { availableWords, getTodayWord } from "../words";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
+import { Sequelize } from "sequelize-typescript";
 
-export default function App() {
+interface Props {
+  readonly sequelize: Sequelize;
+}
+
+export default function App({ sequelize }: Props) {
   useStylesheet("src/data/styles.css");
   const { quit, application } = useApplication();
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const solution = getTodayWord();
 
   const [state, setState] = useReducer(
-    (state: GameState, action: (state: GameState) => IGameState) => {
+    (
+      state: GameState,
+      action: GameState | ((state: GameState) => GameStateAttributes)
+    ) => {
+      if (action instanceof GameState) {
+        action = (action) => action;
+      }
+
       const newState = {
         ...state,
         ...action(state),
       };
       return new GameState({ ...newState });
     },
-    new GameState({ solution })
+    GameState.build({ date: today, solution })
   );
+
+  GameState.findOne({ where: { date: today } }).then((state) => {
+    if (state) {
+      setState(state);
+    }
+  });
 
   const message: string = useMemo(() => {
     if (state.error !== null) {
@@ -104,6 +125,8 @@ export default function App() {
         }
 
         return {
+          date: state.date,
+          solution: state.solution,
           guessRows,
           guessed,
           error,
@@ -131,10 +154,15 @@ export default function App() {
     window.addController(eventKey);
   });
 
+  function onClose() {
+    state.save();
+    return quit();
+  }
+
   return (
     <ApplicationWindow
       title="Wordle"
-      onCloseRequest={quit}
+      onCloseRequest={onClose}
       defaultWidth={600}
       defaultHeight={720}
       resizable={false}

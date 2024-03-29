@@ -1,1 +1,16 @@
-{}
+{
+  "sqltools.connections": [
+    {
+      "database": "/home/rodrigo/Downloads/bazarr.db",
+      "driver": "SQLite",
+      "name": "bazarr",
+      "previewLimit": 50
+    },
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "wordle-gtk",
+      "database": "/home/rodrigo/.local/share/wordle-gtk/data.db"
+    }
+  ]
+}
