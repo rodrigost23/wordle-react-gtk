@@ -1,7 +1,7 @@
 {
-  "name": "simple-example",
+  "name": "Wordle GTK",
   "version": "1.0.0",
-  "description": "A simple example of a React Native GTK app",
+  "description": "Wordle clone using react native and GTK4",
   "main": "dist/index.js",
   "private": true,
   "scripts": {

@@ -1,15 +1,17 @@
-import React, { useCallback, useMemo, useReducer } from "react";
-
+import React, { useCallback, useMemo, useReducer, useState } from "react";
 import {
+  AboutDialog,
   ApplicationWindow,
   AspectFrame,
   Box,
-  Button,
   Gdk,
   Gtk,
   HeaderBar,
   Label,
+  MenuButton,
+  useActionGroup,
   useApplication,
+  useMenu,
   useStylesheet,
 } from "react-native-gtk4";
 import { GameState, GameStateAttributes } from "../models/GameState";
@@ -24,8 +26,27 @@ interface Props {
 export default function App({ initialState }: Props) {
   useStylesheet("src/data/styles.css");
   const { quit, application } = useApplication();
+  const [showAboutDialog, setShowAboutDialog] = useState(false);
 
   const solution = initialState.solution;
+
+  const menu = useMenu(
+    [
+      {
+        label: "About",
+        action: "menu.about",
+      },
+    ],
+    []
+  );
+  const actions = useActionGroup(
+    {
+      about: () => {
+        setShowAboutDialog(true);
+      },
+    },
+    [menu]
+  );
 
   const [state, setState] = useReducer(
     (
@@ -160,7 +181,12 @@ export default function App({ initialState }: Props) {
       titlebar={
         <HeaderBar.Container title={<Label label="Wordle" />}>
           <HeaderBar.Section position="end">
-            <Button></Button>
+            <MenuButton
+              direction={Gtk.ArrowType.NONE}
+              menuModel={menu}
+              actionGroup={actions}
+              actionPrefix="menu"
+            ></MenuButton>
           </HeaderBar.Section>
         </HeaderBar.Container>
       }
@@ -197,6 +223,18 @@ export default function App({ initialState }: Props) {
         <Label label={message} />
         <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
       </Box>
+      {showAboutDialog ? (
+        <AboutDialog
+          programName="Wordle GTK"
+          version={process.env.npm_package_version}
+          copyright="Rodrigo Tavares, 2024."
+          authors={["Rodrigo Tavares <me@rodrigotavar.es>"]}
+          onCloseRequest={() => {
+            setShowAboutDialog(false);
+            return false;
+          }}
+        />
+      ) : null}
     </ApplicationWindow>
   );
 }
