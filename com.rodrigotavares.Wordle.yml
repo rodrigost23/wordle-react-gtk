@@ -4,9 +4,8 @@ runtime-version: "46"
 sdk: org.gnome.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.node18
-  - org.freedesktop.Sdk.Extension.typescript
 build-options:
-  append-path: "/usr/lib/sdk/node18/bin:/usr/lib/sdk/typescript/bin"
+  append-path: "/usr/lib/sdk/node18/bin"
 command: /app/bin/wordle
 finish-args:
   - --share=ipc
@@ -17,21 +16,18 @@ finish-args:
   # - --filesystem=host
   - --filesystem=xdg-config/gtk-3.0
   - --filesystem=xdg-config/gtk-4.0
+"cleanup":
+  - /include
+  - /lib/pkgconfig
+  - /man
+  - /share/doc
+  - /share/gtk-doc
+  - /share/man
+  - /share/pkgconfig
+  - "*.la"
+  - "*.a"
+
 modules:
-  # - name: node
-  #   buildsystem: simple
-  #   build-options:
-  #     build-args:
-  #       - --share=network
-  #   cleanup:
-  #     - /include
-  #     - /lib/pkgconfig
-  #     - /share
-  #   build-commands:
-  #     - echo $(case $(uname -m) in x86_64) echo x64 ;; aarch64) echo arm64 ;; esac) > ARCH
-  #     - echo https://nodejs.org/dist/v18.19.0/node-v18.19.0-linux-$(cat ARCH).tar.xz > URL
-  #     - curl -L $(cat URL) | tar -xJ --strip-components=1 -C /app/
-  #     - rm ARCH URL
   - name: wordle
     build-options:
       build-args:

@@ -7,15 +7,12 @@ find . -name "node_modules" -type d -prune -exec rm -rf '{}' +
 # Install dependencies
 npm install --frozen-lockfile
 
-# Copy root level dependencies to /app/opt/wordle
-mkdir -p /app/opt/wordle
-cp -r node_modules /app/opt/wordle/
-cp package.json /app/opt/wordle/
-
 # Build the app
 npm run build
 
 # Copy the app to /app/opt/wordle
+mkdir -p /app/opt/wordle
+cp package.json /app/opt/wordle/
 cp -r dist/* /app/opt/wordle/
 
 # Copy the icon and desktop file to /app/share
