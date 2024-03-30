@@ -17,7 +17,7 @@ export default function Keyboard({
   state?: KeyboardState;
 }) {
   const keyRows = ["QWERTYUIOP", "ASDFGHJKL", "-ZXCVBNM*"];
-  const width = 380;
+  const width = 600;
   const keySpacing = 4;
   const margin = 16;
   const totalHorizontalSpacing = keySpacing * keyRows[0]!.length - margin;
@@ -42,10 +42,11 @@ export default function Keyboard({
         if (letter === "-") {
           element = (
             <Button
-              label="DELETE"
+              iconName="edit-clear"
+              tooltipText="Backspace"
               sensitive={state?.backspace ?? true}
               focusable={false}
-              widthRequest={keySize}
+              widthRequest={keySize * 1.5}
               heightRequest={keySize}
               onClicked={() => onKeyPress?.("Backspace")}
             />
@@ -53,11 +54,12 @@ export default function Keyboard({
         } else if (letter === "*") {
           element = (
             <Button
-              label="ENTER"
+              iconName="emblem-ok"
+              tooltipText="Confirm"
               cssClasses={["suggested-action"]}
               sensitive={state?.enter ?? true}
               onNotifySensitive={onEnterNotifySensitive}
-              widthRequest={keySize}
+              widthRequest={keySize * 1.5}
               heightRequest={keySize}
               onClicked={() => onKeyPress?.("Enter")}
             />
