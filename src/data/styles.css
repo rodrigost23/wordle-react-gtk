@@ -4,14 +4,14 @@
   font-weight: bold;
 }
 
-.guess-frame.perfect {
+.perfect {
   background-color: #57e38985;
 }
 
-.guess-frame.partial {
+.partial {
   background-color: #f8e45c85;
 }
 
-.guess-frame.absent {
+.absent {
   background-color: #77767b85;
 }

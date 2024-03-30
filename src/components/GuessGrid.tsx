@@ -19,8 +19,9 @@ export default function GuessGrid({
     for (let j = 0; j < 5; j++) {
       const letter = state.guessRows[i]?.[j] ?? "";
       const cssClasses = ["guess-frame"];
-      if (state.guessed > i) {
-        cssClasses.push(checked[j]);
+      const status = checked[j];
+      if (state.guessed > i && status) {
+        cssClasses.push(status);
       }
       row.push(
         <Grid.Item row={i} col={j} key={`guess-${i}-${j}`}>

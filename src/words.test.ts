@@ -1,4 +1,10 @@
-import { checkGuess, countDaysToday, getTodayWord } from "./words";
+import {
+  LetterStatus,
+  checkGuess,
+  countDaysToday,
+  getBetterStatus,
+  getTodayWord,
+} from "./words";
 
 describe("Words", () => {
   describe("countDaysToday", () => {
@@ -79,5 +85,46 @@ describe("checkGuess", () => {
       "perfect",
       "perfect",
     ]);
+  });
+});
+
+describe("getBetterStatus", () => {
+  it('should return "perfect" regardless of old status', () => {
+    const statuses: (LetterStatus | undefined)[] = [
+      undefined,
+      "absent",
+      "partial",
+      "perfect",
+    ];
+    for (const oldStatus of statuses) {
+      expect(getBetterStatus(oldStatus, "perfect")).toBe("perfect");
+    }
+  });
+
+  it('should return "partial" only if old status is not "perfect"', () => {
+    expect(getBetterStatus("perfect", "partial")).toBe("perfect");
+
+    const statuses: (LetterStatus | undefined)[] = [
+      undefined,
+      "absent",
+      "partial",
+    ];
+    for (const oldStatus of statuses) {
+      expect(getBetterStatus(oldStatus, "partial")).toBe("partial");
+    }
+  });
+
+  it('should return "absent" only if old status is not "absent" or undefined', () => {
+    expect(getBetterStatus("perfect", "partial")).toBe("perfect");
+
+    const statuses1: LetterStatus[] = ["partial", "perfect"];
+    for (const oldStatus of statuses1) {
+      expect(getBetterStatus(oldStatus, "absent")).toBe(oldStatus);
+    }
+
+    const statuses2: (LetterStatus | undefined)[] = [undefined, "absent"];
+    for (const oldStatus of statuses2) {
+      expect(getBetterStatus(oldStatus, "absent")).toBe("absent");
+    }
   });
 });

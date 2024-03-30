@@ -15,5 +15,16 @@
   ],
   "yaml.schemas": {
     "https://raw.githubusercontent.com/flatpak/flatpak-builder/main/data/flatpak-manifest.schema.json": "/com.rodrigotavares.Wordle.yml"
-  }
+  },
+  "cSpell.words": [
+    "ASDFGHJKL",
+    "fghij",
+    "girs",
+    "halign",
+    "hexpand",
+    "QWERTYUIOP",
+    "soare",
+    "vexpand",
+    "ZXCVBNM"
+  ]
 }

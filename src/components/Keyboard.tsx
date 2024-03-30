@@ -1,23 +1,27 @@
 import React, { Fragment } from "react";
 import { Box, Button, Gtk } from "react-native-gtk4";
+import { LetterStatus } from "../words";
+
+export interface KeyboardState {
+  enter: boolean;
+  backspace: boolean;
+  letters: boolean;
+  letterStatus: Record<string, LetterStatus>;
+}
 
 export default function Keyboard({
   onKeyPress,
   state,
 }: {
   onKeyPress?: (key: string) => void;
-  state?: {
-    enter: boolean;
-    backspace: boolean;
-    letters: boolean;
-  };
+  state?: KeyboardState;
 }) {
   const keyRows = ["QWERTYUIOP", "ASDFGHJKL", "-ZXCVBNM*"];
   const width = 380;
   const keySpacing = 4;
   const margin = 16;
-  const totalHorizontalSpacing = keySpacing * keyRows[0].length - margin;
-  const keySize = (width - totalHorizontalSpacing) / keyRows[0].length;
+  const totalHorizontalSpacing = keySpacing * keyRows[0]!.length - margin;
+  const keySize = (width - totalHorizontalSpacing) / keyRows[0]!.length;
 
   function onEnterNotifySensitive(node: Gtk.Widget): void {
     if (node.sensitive) {
@@ -50,6 +54,7 @@ export default function Keyboard({
           element = (
             <Button
               label="ENTER"
+              cssClasses={["suggested-action"]}
               sensitive={state?.enter ?? true}
               onNotifySensitive={onEnterNotifySensitive}
               widthRequest={keySize}
@@ -58,9 +63,17 @@ export default function Keyboard({
             />
           );
         } else {
+          const cssClasses = ["opaque"];
+          const status = state?.letterStatus?.[letter.toLowerCase()];
+
+          if (status) {
+            cssClasses.push(status);
+          }
+
           element = (
             <Button
               label={letter}
+              cssClasses={cssClasses}
               sensitive={state?.letters ?? true}
               focusable={false}
               widthRequest={keySize}

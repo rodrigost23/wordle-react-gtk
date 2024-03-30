@@ -35,10 +35,10 @@ export function countDaysToday(): number {
  */
 export function getTodayWord(): string {
   const wordIndex = countDaysToday() % words.length;
-  return words[wordIndex];
+  return words[wordIndex]!;
 }
 
-type LetterStatus = "absent" | "partial" | "perfect";
+export type LetterStatus = "absent" | "partial" | "perfect";
 type LetterCounts = { [letter: string]: number };
 
 /**
@@ -48,7 +48,7 @@ function countLetters(word: string): LetterCounts {
   const counts: LetterCounts = {};
 
   for (const letter of word) {
-    counts[letter] = (counts[letter] || 0) + 1;
+    counts[letter] = (counts[letter] ?? 0) + 1;
   }
 
   return counts;
@@ -82,11 +82,39 @@ export function checkGuess(
   });
 
   guessedWord.split("").forEach((letter, i) => {
-    if (statuses[i] === "absent" && letterCounts[letter] > 0) {
+    if (statuses[i] === "absent" && (letterCounts[letter] ?? 0) > 0) {
       statuses[i] = "partial";
       letterCounts[letter]--;
     }
   });
 
   return statuses;
+}
+
+export function checkLetters(
+  guessedWords: string[],
+  solution: string
+): Record<string, LetterStatus> {
+  const letterStatus: Record<string, LetterStatus> = {};
+  for (const guessedWord of guessedWords) {
+    const checked = checkGuess(guessedWord, solution);
+    const row = [];
+    for (let j = 0; j < 5; j++) {
+      const letter = guessedWord[j] ?? "";
+      const status = checked[j];
+      if (!status) continue;
+
+      letterStatus[letter] = getBetterStatus(letterStatus[letter], status);
+    }
+  }
+  return letterStatus;
+}
+export function getBetterStatus(
+  oldStatus: LetterStatus | undefined,
+  newStatus: LetterStatus
+): LetterStatus {
+  if (!oldStatus || oldStatus === "absent" || newStatus === "perfect") {
+    return newStatus;
+  }
+  return oldStatus;
 }

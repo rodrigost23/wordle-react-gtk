@@ -16,9 +16,9 @@ import {
   useStylesheet,
 } from "react-native-gtk4";
 import { GameState, GameStateAttributes } from "../models/GameState";
-import { availableWords } from "../words";
+import { availableWords, checkLetters } from "../words";
 import GuessGrid from "./GuessGrid";
-import Keyboard from "./Keyboard";
+import Keyboard, { KeyboardState } from "./Keyboard";
 import { Toast } from "./Toast";
 
 interface Props {
@@ -107,7 +107,11 @@ export default function App({ initialState }: Props) {
       backspace,
       enter,
       letters,
-    };
+      letterStatus: checkLetters(
+        state.guessRows.slice(0, state.guessed),
+        solution
+      ),
+    } as KeyboardState;
   }, [state]);
 
   const keySpacing = 4;
@@ -132,7 +136,7 @@ export default function App({ initialState }: Props) {
           }
         } else if (key === "Backspace") {
           if (!state.currentGuess.length) return state;
-          guessRows[state.guessed] = guessRows[state.guessed].slice(0, -1);
+          guessRows[state.guessed] = guessRows[state.guessed]!.slice(0, -1);
         } else if (/[a-zA-Z]/.test(key) && state.currentGuess.length < 5) {
           guessRows[state.guessed] ??= "";
           guessRows[state.guessed] += key.toLowerCase();
