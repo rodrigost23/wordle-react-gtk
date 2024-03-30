@@ -3,6 +3,7 @@ import * as path from "path";
 import React from "react";
 import render, { Gio, Gtk } from "react-native-gtk4";
 import { Sequelize } from "sequelize-typescript";
+import * as sqlite from "sqlite3";
 import App from "./components/App.js";
 import ErrorAlert from "./components/ErrorAlert.js";
 import { GameState } from "./models/GameState.js";
@@ -24,10 +25,11 @@ const application = new Gtk.Application(
 const sequelize = new Sequelize({
   database: "wordle-gtk",
   dialect: "sqlite",
+  dialectModule: sqlite,
   username: "root",
   password: "",
   storage: path.join(dataLocation, "data.db"),
-  models: [path.normalize(path.join(__dirname, "models"))],
+  models: [GameState],
 });
 
 const today = new Date();

@@ -12,5 +12,8 @@
       "name": "wordle-gtk",
       "database": "/home/rodrigo/.local/share/wordle-gtk/data.db"
     }
-  ]
+  ],
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/flatpak/flatpak-builder/main/data/flatpak-manifest.schema.json": "/com.rodrigotavares.Wordle.yml"
+  }
 }
