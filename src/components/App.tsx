@@ -9,6 +9,7 @@ import {
   HeaderBar,
   Label,
   MenuButton,
+  Overlay,
   useActionGroup,
   useApplication,
   useMenu,
@@ -18,6 +19,7 @@ import { GameState, GameStateAttributes } from "../models/GameState";
 import { availableWords } from "../words";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
+import { Toast } from "./Toast";
 
 interface Props {
   readonly initialState: GameState;
@@ -126,7 +128,7 @@ export default function App({ initialState }: Props) {
           if (availableWords.includes(state.currentGuess)) {
             guessed += 1;
           } else {
-            error = `"${state.currentGuess}" is not in the words list!`;
+            error = `"${state.currentGuess.toUpperCase()}" is not in the words list!`;
           }
         } else if (key === "Backspace") {
           if (!state.currentGuess.length) return state;
@@ -203,24 +205,36 @@ export default function App({ initialState }: Props) {
         marginBottom={margin}
         marginStart={margin}
       >
-        <AspectFrame
-          hexpand
-          vexpand
-          halign={Gtk.Align.FILL}
-          valign={Gtk.Align.FILL}
-          marginBottom={24}
-          ratio={5 / 6}
-          obeyChild={false}
+        <Overlay
+          content={
+            <AspectFrame
+              hexpand
+              vexpand
+              halign={Gtk.Align.FILL}
+              valign={Gtk.Align.FILL}
+              ratio={5 / 6}
+              obeyChild={false}
+            >
+              <Box
+                hexpand
+                vexpand
+                halign={Gtk.Align.FILL}
+                valign={Gtk.Align.FILL}
+                marginBottom={margin}
+              >
+                <GuessGrid
+                  spacing={keySpacing}
+                  state={state}
+                  correctWord={solution}
+                />
+              </Box>
+            </AspectFrame>
+          }
         >
-          <Box hexpand vexpand halign={Gtk.Align.FILL} valign={Gtk.Align.FILL}>
-            <GuessGrid
-              spacing={keySpacing}
-              state={state}
-              correctWord={solution}
-            />
+          <Box hexpand vexpand halign={Gtk.Align.CENTER}>
+            <Toast title={message} timeout={state.isFinished ? 0 : 3}></Toast>
           </Box>
-        </AspectFrame>
-        <Label label={message} />
+        </Overlay>
         <Keyboard state={keyboardState} onKeyPress={onKeyPress} />
       </Box>
       {showAboutDialog ? (
