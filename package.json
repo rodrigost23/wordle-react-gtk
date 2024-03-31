@@ -5,20 +5,20 @@
   "main": "dist/index.js",
   "private": true,
   "scripts": {
-    "build": "ncc build --minify src/index.tsx -o dist",
-    "build:debug": "tsc --sourceMap",
+    "build": "rm -rf dist && ncc build --minify src/index.tsx -o dist",
+    "build:debug": "rm -rf dist && tsc --sourceMap",
     "start": "npm run build && node dist/index.js",
     "test": "jest",
-    "flatpak:build": "flatpak-builder --force-clean --bundle-sources build com.rodrigotavares.Wordle.yml",
-    "flatpak:install": "flatpak-builder --user --install --force-clean build com.rodrigotavares.Wordle.yml",
-    "flatpak:bundle": "flatpak build-export export build && flatpak build-bundle export wordle-gtk.flatpak com.rodrigotavares.Wordle",
-    "flatpak:run": "flatpak run com.rodrigotavares.Wordle"
+    "flatpak:build": "flatpak-builder --install-deps-from=flathub --user --force-clean build build-aux/flatpak/com.rodrigotavares.Wordle.yml",
+    "flatpak:install": "flatpak-builder --install-deps-from=flathub --user --force-clean --install build build-aux/flatpak/com.rodrigotavares.Wordle.yml",
+    "flatpak:bundle": "flatpak build-export export build && flatpak build-bundle export com.rodrigotavares.Wordle.flatpak com.rodrigotavares.Wordle",
+    "flatpak:run": "flatpak --user run com.rodrigotavares.Wordle"
   },
   "dependencies": {
     "@girs/node-adw-1": "^1.4.3-3.3.0",
     "@girs/node-gtk-4.0": "^4.12.5-3.3.0",
     "react": "^18.2.0",
-    "react-native-gtk4": "^1.28.0",
+    "react-native-gtk4": "^1.30.0",
     "reflect-metadata": "^0.2.1",
     "sequelize": "^6.37.1",
     "sequelize-typescript": "^2.1.6",
