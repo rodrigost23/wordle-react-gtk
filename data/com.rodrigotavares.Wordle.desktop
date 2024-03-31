@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Wordle GTK
+Comment=A Wordle clone in GTK 4
+Exec=/app/bin/wordle
+Icon=com.rodrigotavares.Wordle
+Terminal=false
+Categories=Application;Games;

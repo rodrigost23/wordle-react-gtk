@@ -16,10 +16,10 @@ cp package.json /app/opt/wordle/
 cp -r dist/* /app/opt/wordle/
 
 # Copy the icon and desktop file to /app/share
-# mkdir -p /app/share/applications
-# mkdir -p /app/share/icons/hicolor/96x96/apps
-# cp data/com.example.Example.desktop /app/share/applications/
-# cp data/com.example.Example.png /app/share/icons/hicolor/96x96/apps/
+mkdir -p /app/share/applications
+mkdir -p /app/share/icons/hicolor/96x96/apps
+cp data/com.rodrigotavares.Wordle.desktop /app/share/applications/
+cp data/com.rodrigotavares.Wordle.png /app/share/icons/hicolor/96x96/apps/
 
 # Create a symlink to the app in /app/bin
 mkdir -p /app/bin
