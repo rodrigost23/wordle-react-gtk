@@ -19,7 +19,7 @@ export function Toast({ title, timeout }: Props) {
     const toast = new Adw.Toast({ title, timeout });
 
     overlay.addToast(toast);
-    box.append(overlay as unknown as Gtk.Widget);
+    box.append(overlay);
   }, [title]);
 
   return <Box orientation={Gtk.Orientation.VERTICAL} ref={boxRef} />;
