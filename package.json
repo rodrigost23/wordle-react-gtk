@@ -2,11 +2,13 @@
   "name": "wordle-gtk",
   "version": "1.0.0",
   "description": "Wordle clone using react native and GTK4",
+  "source": "src/index.tsx",
   "main": "dist/index.js",
+  "type": "module",
   "private": true,
   "scripts": {
-    "build": "rm -rf dist && ncc build --minify src/index.tsx -o dist",
-    "build:debug": "rm -rf dist && tsc --sourceMap",
+    "build": "rm -rf dist && rollup -c",
+    "build:dev": "rm -rf dist && tsc --sourceMap",
     "start": "npm run build && node dist/index.js",
     "test": "jest",
     "flatpak:build": "flatpak-builder --install-deps-from=flathub --user --force-clean build com.rodrigotavares.Wordle.yml",
@@ -15,6 +17,7 @@
     "flatpak:run": "flatpak --user run com.rodrigotavares.Wordle"
   },
   "dependencies": {
+    "@girs/adw-1": "^1.4.3-3.3.0",
     "@girs/node-adw-1": "^1.4.3-3.3.0",
     "@girs/node-gtk-4.0": "^4.12.5-3.3.0",
     "react": "^18.2.0",
@@ -25,12 +28,29 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.24.3",
+    "@babel/preset-react": "^7.24.1",
+    "@hyrious/esbuild-plugin-commonjs": "^0.2.4",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/jest": "^29.5.12",
     "@types/react": "^18.2.66",
     "@types/validator": "^13.11.9",
     "@vercel/ncc": "^0.38.1",
+    "esbuild": "0.20.2",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
     "jest": "^29.7.0",
+    "rollup": "^4.13.2",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "rollup-plugin-typescript2": "^0.36.0",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.4.2"
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.3"
   }
 }
