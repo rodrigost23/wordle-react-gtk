@@ -1,3 +1,4 @@
+import * as path from "path";
 import React, { useCallback, useMemo, useReducer, useState } from "react";
 import {
   AboutDialog,
@@ -26,7 +27,7 @@ interface Props {
 }
 
 export default function App({ initialState }: Props) {
-  useStylesheet("src/data/styles.css");
+  useStylesheet(path.normalize(__dirname + "/../data/styles.css"));
   const { quit, application } = useApplication();
   const [showAboutDialog, setShowAboutDialog] = useState(false);
 
