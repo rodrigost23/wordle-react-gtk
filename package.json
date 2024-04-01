@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "build": "rm -rf dist && ncc build --minify src/index.tsx -o dist",
-    "build:debug": "rm -rf dist && tsc --sourceMap",
+    "build:debug": "rm -rf dist && tsc --sourceMap && cp -rv src/data/*.css dist/data/",
     "start": "npm run build && node dist/index.js",
     "test": "jest",
     "flatpak:build": "flatpak-builder --install-deps-from=flathub --user --force-clean build com.rodrigotavares.Wordle.yml",
