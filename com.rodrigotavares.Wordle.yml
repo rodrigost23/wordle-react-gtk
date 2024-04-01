@@ -32,6 +32,8 @@ modules:
     build-options:
       build-args:
         - --share=network
+        - --filesystem=~/.npm
+        - --filesystem=/tmp/ncc-cache
     buildsystem: simple
     build-commands:
       - ./build-flatpak.sh
