@@ -1,3 +1,4 @@
+import Adw from "@girs/node-adw-1";
 import * as os from "os";
 import * as path from "path";
 import React from "react";
@@ -17,10 +18,12 @@ let dataLocation: string | undefined =
 
 dataLocation = path.join(dataLocation, "wordle-gtk");
 
-const application = new Gtk.Application(
-  "com.rodrigotavares.wordle",
-  Gio.ApplicationFlags.DEFAULT_FLAGS
-);
+Adw.init();
+
+const application = new Gtk.Application({
+  application_id: "com.rodrigotavares.Wordle",
+  flags: Gio.ApplicationFlags.DEFAULT_FLAGS,
+});
 
 const sequelize = new Sequelize({
   database: "wordle-gtk",
