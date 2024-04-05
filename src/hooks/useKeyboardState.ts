@@ -3,7 +3,9 @@ import { KeyboardState } from "../components/Keyboard";
 import { GameState } from "../models/GameState";
 import { checkLetters } from "../words";
 
-export function useKeyboardState(gameState: GameState): KeyboardState {
+export function useKeyboardState(
+  gameState: Readonly<GameState>
+): KeyboardState {
   return useMemo(() => {
     let backspace = true;
     let enter = true;

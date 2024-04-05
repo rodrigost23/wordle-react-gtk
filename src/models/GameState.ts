@@ -8,6 +8,8 @@ export interface GameStateAttributes {
   readonly solution: string;
 }
 
+const MAX_GUESSES = 6;
+
 @Table({
   timestamps: false,
 })
@@ -41,6 +43,6 @@ export class GameState
   }
 
   get isFinished() {
-    return this.isSolved || this.guessed >= 6;
+    return this.isSolved || this.guessed >= MAX_GUESSES;
   }
 }

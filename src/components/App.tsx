@@ -1,5 +1,5 @@
 import * as path from "path";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   AboutDialog,
   ApplicationWindow,
@@ -17,9 +17,9 @@ import {
   useStylesheet,
 } from "react-native-gtk4";
 import { useGameState } from "../hooks/useGameState";
+import { useKeyPressHandler } from "../hooks/useKeyPressHandler";
 import { useKeyboardState } from "../hooks/useKeyboardState";
 import { GameState } from "../models/GameState";
-import { availableWords } from "../words";
 import GuessGrid from "./GuessGrid";
 import Keyboard from "./Keyboard";
 import { Toast } from "./Toast";
@@ -33,24 +33,42 @@ export default function App({ initialState }: Props) {
   const { quit, application } = useApplication();
   const [showAboutDialog, setShowAboutDialog] = useState(false);
   const [state, updateState] = useGameState(initialState);
+  const onKeyPress = useKeyPressHandler(state, updateState);
+  const keyboardState = useKeyboardState(state);
 
-  const menu = useMenu(
-    [
-      {
-        label: "About",
-        action: "menu.about",
-      },
-    ],
-    []
-  );
-  const actions = useActionGroup(
-    {
-      about: () => {
-        setShowAboutDialog(true);
-      },
-    },
-    [menu]
-  );
+  // Events
+  const onAddWindow = (window: Gtk.Window): void => {
+    const eventKey = new Gtk.EventControllerKey();
+    eventKey.connect("key-released", (keyval) => {
+      if (keyval === Gdk.KEY_Return) {
+        onKeyPress("Enter");
+      } else if (keyval === Gdk.KEY_BackSpace) {
+        onKeyPress("Backspace");
+      } else if (
+        (keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
+        (keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z)
+      ) {
+        onKeyPress(String.fromCharCode(keyval));
+      }
+    });
+
+    window.addController(eventKey);
+  };
+
+  const onAboutClick = () => {
+    setShowAboutDialog(true);
+  };
+
+  function onClose() {
+    GameState.upsert(state.dataValues);
+    return quit();
+  }
+
+  // ----
+
+  const menu = useMenu([{ label: "About", action: "menu.about" }], []);
+  const actions = useActionGroup({ about: onAboutClick }, [menu]);
+  application.connect("window-added", onAddWindow);
 
   const message: string = useMemo(() => {
     if (state.error !== null) {
@@ -68,70 +86,8 @@ export default function App({ initialState }: Props) {
     return "";
   }, [state.isFinished, state.error]);
 
-  const keyboardState = useKeyboardState(state);
-
   const keySpacing = 4;
   const margin = 16;
-
-  const onKeyPress = useCallback(
-    (key: string) => {
-      updateState((state: GameState) => {
-        if (state.isFinished) return state;
-
-        let guessRows = [...state.guessRows];
-        let guessed = state.guessed;
-        let error: string | null = null;
-
-        if (key === "Enter") {
-          if (state.currentGuess.length < 5) return state;
-
-          if (availableWords.includes(state.currentGuess)) {
-            guessed += 1;
-          } else {
-            error = `"${state.currentGuess.toUpperCase()}" is not in the words list!`;
-          }
-        } else if (key === "Backspace") {
-          if (!state.currentGuess.length) return state;
-          guessRows[state.guessed] = guessRows[state.guessed]!.slice(0, -1);
-        } else if (/[a-zA-Z]/.test(key) && state.currentGuess.length < 5) {
-          guessRows[state.guessed] ??= "";
-          guessRows[state.guessed] += key.toLowerCase();
-        }
-
-        return {
-          date: state.date,
-          solution: state.solution,
-          guessRows,
-          guessed,
-          error,
-        };
-      });
-    },
-    [state.currentGuess]
-  );
-
-  application.connect("window-added", (window) => {
-    const eventKey = new Gtk.EventControllerKey();
-    eventKey.connect("key-released", (keyval) => {
-      if (keyval === Gdk.KEY_Return) {
-        onKeyPress("Enter");
-      } else if (keyval === Gdk.KEY_BackSpace) {
-        onKeyPress("Backspace");
-      } else if (
-        (keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
-        (keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z)
-      ) {
-        onKeyPress(String.fromCharCode(keyval));
-      }
-    });
-
-    window.addController(eventKey);
-  });
-
-  function onClose() {
-    GameState.upsert(state.dataValues);
-    return quit();
-  }
 
   return (
     <ApplicationWindow
