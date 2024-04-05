@@ -17,10 +17,11 @@ import {
   useStylesheet,
 } from "react-native-gtk4";
 import { useGameState } from "../hooks/useGameState";
+import { useKeyboardState } from "../hooks/useKeyboardState";
 import { GameState } from "../models/GameState";
-import { availableWords, checkLetters } from "../words";
+import { availableWords } from "../words";
 import GuessGrid from "./GuessGrid";
-import Keyboard, { KeyboardState } from "./Keyboard";
+import Keyboard from "./Keyboard";
 import { Toast } from "./Toast";
 
 interface Props {
@@ -67,34 +68,7 @@ export default function App({ initialState }: Props) {
     return "";
   }, [state.isFinished, state.error]);
 
-  const keyboardState = useMemo(() => {
-    let backspace = true;
-    let enter = true;
-    let letters = true;
-
-    if (state.isFinished) {
-      backspace = false;
-      enter = false;
-      letters = false;
-    } else if (state.currentGuess.length == 0) {
-      backspace = false;
-      enter = false;
-    } else if (state.currentGuess.length >= 5) {
-      letters = false;
-    } else {
-      enter = false;
-    }
-
-    return {
-      backspace,
-      enter,
-      letters,
-      letterStatus: checkLetters(
-        state.guessRows.slice(0, state.guessed),
-        state.solution
-      ),
-    } as KeyboardState;
-  }, [state]);
+  const keyboardState = useKeyboardState(state);
 
   const keySpacing = 4;
   const margin = 16;
