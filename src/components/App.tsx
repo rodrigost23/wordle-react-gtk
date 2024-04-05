@@ -1,5 +1,5 @@
 import * as path from "path";
-import React, { useCallback, useMemo, useReducer, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   AboutDialog,
   ApplicationWindow,
@@ -16,7 +16,8 @@ import {
   useMenu,
   useStylesheet,
 } from "react-native-gtk4";
-import { GameState, GameStateAttributes } from "../models/GameState";
+import { useGameState } from "../hooks/useGameState";
+import { GameState } from "../models/GameState";
 import { availableWords, checkLetters } from "../words";
 import GuessGrid from "./GuessGrid";
 import Keyboard, { KeyboardState } from "./Keyboard";
@@ -30,8 +31,7 @@ export default function App({ initialState }: Props) {
   useStylesheet(path.normalize(__dirname + "/../data/styles.css"));
   const { quit, application } = useApplication();
   const [showAboutDialog, setShowAboutDialog] = useState(false);
-
-  const solution = initialState.solution;
+  const [state, updateState] = useGameState(initialState);
 
   const menu = useMenu(
     [
@@ -51,25 +51,6 @@ export default function App({ initialState }: Props) {
     [menu]
   );
 
-  const [state, setState] = useReducer(
-    (
-      state: GameState,
-      action: GameState | ((state: GameState) => GameStateAttributes)
-    ) => {
-      if (action instanceof GameState) {
-        action = (action) => action;
-      }
-
-      const newState = {
-        ...state.dataValues,
-        ...action(state),
-      };
-
-      return GameState.build({ ...newState });
-    },
-    initialState
-  );
-
   const message: string = useMemo(() => {
     if (state.error !== null) {
       return state.error;
@@ -80,7 +61,7 @@ export default function App({ initialState }: Props) {
     }
 
     if (state.isFinished) {
-      return `The correct word was "${solution}"`;
+      return `The correct word was "${state.solution}"`;
     }
 
     return "";
@@ -110,7 +91,7 @@ export default function App({ initialState }: Props) {
       letters,
       letterStatus: checkLetters(
         state.guessRows.slice(0, state.guessed),
-        solution
+        state.solution
       ),
     } as KeyboardState;
   }, [state]);
@@ -120,7 +101,7 @@ export default function App({ initialState }: Props) {
 
   const onKeyPress = useCallback(
     (key: string) => {
-      setState((state: GameState) => {
+      updateState((state: GameState) => {
         if (state.isFinished) return state;
 
         let guessRows = [...state.guessRows];
@@ -230,7 +211,7 @@ export default function App({ initialState }: Props) {
                 <GuessGrid
                   spacing={keySpacing}
                   state={state}
-                  correctWord={solution}
+                  correctWord={state.solution}
                 />
               </Box>
             </AspectFrame>
